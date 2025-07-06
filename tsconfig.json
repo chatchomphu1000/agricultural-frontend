@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "es6"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/components/*": ["./src/presentation/components/*"],
+      "@/pages/*": ["./src/presentation/pages/*"],
+      "@/hooks/*": ["./src/presentation/hooks/*"],
+      "@/store/*": ["./src/presentation/store/*"],
+      "@/services/*": ["./src/infrastructure/services/*"],
+      "@/repositories/*": ["./src/infrastructure/repositories/*"],
+      "@/entities/*": ["./src/domain/entities/*"],
+      "@/use-cases/*": ["./src/domain/use-cases/*"],
+      "@/interfaces/*": ["./src/domain/interfaces/*"],
+      "@/utils/*": ["./src/shared/utils/*"],
+      "@/types/*": ["./src/shared/types/*"],
+      "@/constants/*": ["./src/shared/constants/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
