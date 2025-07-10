@@ -12,10 +12,14 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
-import { InventoryService, StockSummary } from '../../../infrastructure/services/inventory.service';
-import { SalesService, SalesSummary, ProductSales } from '../../../infrastructure/services/sales.service';
+import type { 
+  ProductSales, 
+  StockSummary, 
+  SalesSummary, 
+  Notification 
+} from '../../../shared/types';
 
-// Register Chart.js components
+// Chart.js registration
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -26,6 +30,49 @@ ChartJS.register(
   ArcElement
 );
 
+// Mock data constants
+const MOCK_SALES_DATA = {
+  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+  datasets: [
+    {
+      label: 'Monthly Sales',
+      data: [12000, 19000, 15000, 25000, 22000, 30000],
+      backgroundColor: 'rgba(34, 197, 94, 0.8)',
+      borderColor: 'rgb(34, 197, 94)',
+      borderWidth: 1,
+    },
+  ],
+};
+
+const MOCK_NOTIFICATIONS: Notification[] = [
+  { 
+    id: 1, 
+    type: 'warning', 
+    message: 'Wheat stock is running low (8 units remaining)', 
+    time: '2 hours ago' 
+  },
+  { 
+    id: 2, 
+    type: 'info', 
+    message: 'New product "Organic Rice" added successfully', 
+    time: '4 hours ago' 
+  },
+  { 
+    id: 3, 
+    type: 'error', 
+    message: 'Corn is out of stock', 
+    time: '1 day ago' 
+  },
+];
+
+const CHART_COLORS = [
+  '#10B981',
+  '#3B82F6', 
+  '#F59E0B',
+  '#EF4444',
+  '#8B5CF6',
+];
+
 export default function DashboardOverview() {
   const [stockSummary, setStockSummary] = useState<StockSummary | null>(null);
   const [salesSummary, setSalesSummary] = useState<SalesSummary | null>(null);
@@ -33,34 +80,15 @@ export default function DashboardOverview() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [salesData, setSalesData] = useState({
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Monthly Sales',
-        data: [12000, 19000, 15000, 25000, 22000, 30000],
-        backgroundColor: 'rgba(34, 197, 94, 0.8)',
-        borderColor: 'rgb(34, 197, 94)',
-        borderWidth: 1,
-      },
-    ],
-  });
-
-  const [notifications] = useState([
-    { id: 1, type: 'warning', message: 'Wheat stock is running low (8 units remaining)', time: '2 hours ago' },
-    { id: 2, type: 'info', message: 'New product "Organic Rice" added successfully', time: '4 hours ago' },
-    { id: 3, type: 'error', message: 'Corn is out of stock', time: '1 day ago' },
-  ]);
-
   useEffect(() => {
     fetchDashboardData();
   }, []);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (): Promise<void> => {
     try {
       setLoading(true);
       
-      // Mock data for now (until services are fixed)
+      // Mock data for demonstration
       const mockStockData: StockSummary = {
         totalProducts: 150,
         lowStockItems: 12,
@@ -83,10 +111,42 @@ export default function DashboardOverview() {
       };
 
       const mockProductSalesData: ProductSales[] = [
-        { productId: 1, productName: 'Organic Fertilizer', totalSales: 150, totalRevenue: 15000, category: 'Fertilizers', salesCount: 150, avgPrice: 100 },
-        { productId: 2, productName: 'Tomato Seeds', totalSales: 120, totalRevenue: 12000, category: 'Seeds', salesCount: 120, avgPrice: 100 },
-        { productId: 3, productName: 'Garden Hose', totalSales: 85, totalRevenue: 8500, category: 'Tools', salesCount: 85, avgPrice: 100 },
-        { productId: 4, productName: 'Insecticide', totalSales: 95, totalRevenue: 9500, category: 'Pesticides', salesCount: 95, avgPrice: 100 }
+        { 
+          productId: 1, 
+          productName: 'Organic Fertilizer', 
+          totalSales: 150, 
+          totalRevenue: 15000, 
+          category: 'Fertilizers', 
+          salesCount: 150, 
+          avgPrice: 100 
+        },
+        { 
+          productId: 2, 
+          productName: 'Tomato Seeds', 
+          totalSales: 120, 
+          totalRevenue: 12000, 
+          category: 'Seeds', 
+          salesCount: 120, 
+          avgPrice: 100 
+        },
+        { 
+          productId: 3, 
+          productName: 'Garden Hose', 
+          totalSales: 85, 
+          totalRevenue: 8500, 
+          category: 'Tools', 
+          salesCount: 85, 
+          avgPrice: 100 
+        },
+        { 
+          productId: 4, 
+          productName: 'Insecticide', 
+          totalSales: 95, 
+          totalRevenue: 9500, 
+          category: 'Pesticides', 
+          salesCount: 95, 
+          avgPrice: 100 
+        }
       ];
 
       setStockSummary(mockStockData);
@@ -101,19 +161,13 @@ export default function DashboardOverview() {
     }
   };
 
-  // Create chart data from API response
+  // Create chart data from product sales
   const productSalesChartData = {
     labels: productSales.map(item => item.productName),
     datasets: [
       {
         data: productSales.map(item => item.totalRevenue),
-        backgroundColor: [
-          '#10B981',
-          '#3B82F6',
-          '#F59E0B',
-          '#EF4444',
-          '#8B5CF6',
-        ],
+        backgroundColor: CHART_COLORS,
         borderWidth: 2,
       },
     ],
@@ -210,12 +264,12 @@ export default function DashboardOverview() {
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Monthly Sales</h3>
           <Bar 
-            data={salesData} 
+            data={MOCK_SALES_DATA} 
             options={{
               responsive: true,
               plugins: {
                 legend: {
-                  position: 'top',
+                  position: 'top' as const,
                 },
                 title: {
                   display: true,
@@ -235,7 +289,7 @@ export default function DashboardOverview() {
                 responsive: true,
                 plugins: {
                   legend: {
-                    position: 'bottom',
+                    position: 'bottom' as const,
                   },
                   title: {
                     display: true,
@@ -269,7 +323,7 @@ export default function DashboardOverview() {
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {stockSummary.byCategory.map((category, index) => (
+              {stockSummary.byCategory.map((category, index: number) => (
                 <div key={index} className="bg-gray-50 p-4 rounded-lg">
                   <h4 className="font-medium text-gray-900">{category.category}</h4>
                   <p className="text-sm text-gray-600">{category.count} products</p>
@@ -287,7 +341,7 @@ export default function DashboardOverview() {
           <h3 className="text-lg font-medium text-gray-900">Recent Notifications</h3>
         </div>
         <div className="divide-y divide-gray-200">
-          {notifications.map((notification) => (
+          {MOCK_NOTIFICATIONS.map((notification: Notification) => (
             <div key={notification.id} className="px-6 py-4">
               <div className="flex items-start">
                 <div className={`flex-shrink-0 w-2 h-2 rounded-full mt-2 ${

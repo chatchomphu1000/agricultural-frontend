@@ -1,7 +1,29 @@
 import axios from 'axios';
 
+// Check if we should use mock API
+const USE_MOCK_API = process.env.NEXT_PUBLIC_USE_MOCK_API === 'true';
+
 // Create fresh API service each time to avoid SSR issues
 export const createApiService = () => {
+  // If using mock API, return a service that doesn't make real HTTP calls
+  if (USE_MOCK_API) {
+    return {
+      async get<T>(url: string): Promise<T> {
+        // This will be handled by individual service implementations
+        throw new Error('Mock API: Use specific service implementation');
+      },
+      async post<T>(url: string, data?: any): Promise<T> {
+        throw new Error('Mock API: Use specific service implementation');
+      },
+      async put<T>(url: string, data?: any): Promise<T> {
+        throw new Error('Mock API: Use specific service implementation');
+      },
+      async delete<T>(url: string): Promise<T> {
+        throw new Error('Mock API: Use specific service implementation');
+      }
+    };
+  }
+
   const axiosInstance = axios.create({
     baseURL: '/api/proxy', // Use Next.js proxy instead of direct backend URL
     timeout: 10000,
@@ -43,3 +65,6 @@ export const createApiService = () => {
     }
   };
 };
+
+// Export the mock API flag for use in other services
+export { USE_MOCK_API };

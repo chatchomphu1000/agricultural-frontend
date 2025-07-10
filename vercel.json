@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "agricultural-frontend",
+  "framework": "nextjs",
+  "functions": {
+    "src/app/api/proxy/[...path]/route.ts": {
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/proxy/(.*)",
+      "destination": "/api/proxy/$1"
+    }
+  ]
+}

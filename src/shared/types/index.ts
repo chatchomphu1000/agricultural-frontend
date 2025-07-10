@@ -52,3 +52,40 @@ export interface ToastMessage {
   message?: string;
   duration?: number;
 }
+
+export interface ProductSales {
+  productId: number;
+  productName: string;
+  totalSales: number;
+  totalRevenue: number;
+  category: string;
+  salesCount: number;
+  avgPrice: number;
+}
+
+export interface StockSummary {
+  totalProducts: number;
+  lowStockItems: number;
+  outOfStockItems: number;
+  totalValue: number;
+  byCategory: Array<{
+    category: string;
+    count: number;
+    totalStock: number;
+  }>;
+}
+
+export interface SalesSummary {
+  totalSales: number;
+  totalRevenue: number;
+  avgOrderValue: number;
+  salesGrowth: number;
+  topSellingProduct: string;
+}
+
+export interface Notification {
+  id: number;
+  type: 'warning' | 'error' | 'info' | 'success';
+  message: string;
+  time: string;
+}
